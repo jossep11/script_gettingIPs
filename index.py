@@ -3,6 +3,8 @@ import os
 import json
 import asyncio
 from decouple import config
+import ipaddress
+import re
 
 async def main():
     url1='https://billing.osnetpr.com/api/2.0/?method=support.ticket_list&queue=57&type=Open'
@@ -20,7 +22,16 @@ async def main():
             r2=requests.get(url2, auth=(user, passw), verify=False)    
             await asyncio.sleep(1)
             data2= r2.json()
-            print(data2['data']['metadata']['ip_address'])
+            ips=data2['data']['metadata']['ip_address']
+            # print(data2['data']['metadata']['ip_address'])
+            dataRegex= re.sub('([http\s/:])+', '', ips)
+            try:
+                # ipaddress.ip_address(data2['data']['metadata']['ip_address']) 
+                if ipaddress.ip_address(dataRegex):
+                    print(dataRegex, '= valid ip')
+            except:              
+                print('not an ip')
+            
             print('=========================== break ====================================================================')
 
 asyncio.run(main())
